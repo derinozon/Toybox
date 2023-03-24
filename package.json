@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "displayName": "Toybox",
   "description": "Basic assets for prototyping",
-  "unity": "2021.3.8",
  "keywords": [
     "prototyping",
     "game jam"

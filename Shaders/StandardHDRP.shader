@@ -166,5 +166,5 @@ Shader "Toybox/StandardHDRP" {
         ENDCG
     }
     FallBack "Diffuse"
-	CustomEditor "StandardHDRPGUI"
+	CustomEditor "Toybox.StandardHDRPGUI"
 }

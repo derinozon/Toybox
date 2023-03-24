@@ -1,0 +1,16 @@
+{
+  "name": "com.derinozon.toybox",
+  "version": "0.0.1",
+  "displayName": "Toybox",
+  "description": "Basic assets for prototyping",
+  "unity": "2021.3.8",
+ "keywords": [
+    "prototyping",
+    "game jam"
+  ],
+  "author": {
+    "name": "Derin Ozon",
+    "email": "derinozon@gmail.com",
+    "url": "https://www.derinozon.com"
+  }
+}

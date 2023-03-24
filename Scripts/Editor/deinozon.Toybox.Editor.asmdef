@@ -1,8 +1,8 @@
 {
-    "name": "derinozon.Toybox",
+    "name": "deinozon.Toybox.Editor",
     "rootNamespace": "",
     "references": [
-        "derinozon.Toybox"
+        "deinozon.Toybox"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

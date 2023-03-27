@@ -12,7 +12,9 @@ Shader "Toybox/StandardHDRP" {
 		[HDR] _EmissionColor ("Emission Color", Color) = (0.0, 0.0, 0.0, 0.0)
 
 		[NoScaleOffset] _HeightMap("Height Map", 2D) = "white" {}
-		_HeightPower("Height Power", Range(0,0.15)) = 0
+		_HeightPower("Height Power", Range(0, 0.01)) = 0
+
+		_OcclusionStrenght("Occlusion Strenght", Range(0, 1)) = 1
 
 		// If no Mask Map //
 		_Smoothness("Smoothness", Range(0, 1)) = 0.5
@@ -35,10 +37,14 @@ Shader "Toybox/StandardHDRP" {
 		}
 		LOD 200
 
+		//////////////////
+		// Outline Pass //
+		//////////////////
+
 		Pass {
 			// Unity does not allow SetShaderPassEnabled with Name tag. //
 
-			//Name "OutlinePass"
+			Name "OutlinePass"
 			Tags { "LightMode" = "Always" } 
 			//Tags { "LightMode" = "OutlinePass" }
 			Zwrite Off
@@ -93,77 +99,46 @@ Shader "Toybox/StandardHDRP" {
             ENDCG
 		}
 		
+		////////////////////
+		// Object Drawing //
+		////////////////////
+
 		ZWrite [_ZWrite]
-        Blend [_SrcBlend] [_DstBlend]
-		Cull Off
+		Blend [_SrcBlend] [_DstBlend]
 
-        CGPROGRAM	
-        #pragma surface surf Standard fullforwardshadows keepalpha
+		Tags { "RenderType" = "Opaque" }
+		LOD 200
+		Cull Back
 
-		#pragma target 3.0
-
+		CGPROGRAM	
+		#pragma surface surf Standard fullforwardshadows keepalpha
+		#include "StandardHDRPMain.cginc"
+		ENDCG
 		
 
-		#pragma multi_compile __ MASK_ON
+		//////////////////
+		// Double Sided //
+		//////////////////
+		ZWrite [_ZWrite]
+		Blend [_SrcBlend] [_DstBlend]
 
-		
-        #include "UnityPBSLighting.cginc"
-        
- 
-        sampler2D _MainTex;
-        sampler2D _Normal;
-		sampler2D _Emission;
-		sampler2D _Mask;
-		sampler2D _HeightMap;
-		
-        struct Input {
-            float2 uv_MainTex;
-			float2 uv_Normal;
-			float3 viewDir;
-        };
- 
- 
-		
-		float _HeightPower;
-		float _NormalStr;
+		Tags { "RenderType" = "Opaque" }
+		LOD 200
+		Cull Front
 
+		CGPROGRAM
+		// #pragma multi_compile __ DOUBLE_SIDED
+		// #if DOUBLE_SIDED
+		#pragma surface surf Standard fullforwardshadows keepalpha
+		#pragma vertex vert
+		#include "StandardHDRPMain.cginc"
 
-        fixed4 _Color;
-		fixed3 _EmissionColor;
-		float _EmissionStr;
-		float _Smoothness;
-		float _Metalness;
- 
-       
-        UNITY_INSTANCING_BUFFER_START(Props)
-            
-        UNITY_INSTANCING_BUFFER_END(Props)
- 
-        void surf (Input IN, inout SurfaceOutputStandard o) {
-
-            fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-            o.Albedo = c.rgb;
-			
-			float2 texOffset = ParallaxOffset(tex2D(_HeightMap, IN.uv_MainTex).r, _HeightPower, IN.viewDir);
-			o.Normal = UnpackNormal(tex2D(_Normal, IN.uv_Normal + 0));
-			o.Emission = tex2D(_Emission, IN.uv_MainTex).rgb * _EmissionColor;// * _EmissionStr;
-
-			// MASK //
-			#if MASK_ON
-			fixed4 maskCol = tex2D (_Mask, IN.uv_MainTex);
-
-			o.Smoothness = maskCol.a;
-			o.Occlusion = maskCol.g;
-			o.Metallic = maskCol.r;
-			#else
-			o.Smoothness = _Smoothness;
-			o.Occlusion = 1.0;
-			o.Metallic = _Metalness;
-			#endif
-
-			o.Alpha = c.a;
-        }
-        ENDCG
+		void vert(inout appdata_full v, out Input o) {
+			UNITY_INITIALIZE_OUTPUT(Input, o);
+			v.normal = -v.normal;
+		}
+		// #endif
+		ENDCG
     }
     FallBack "Diffuse"
 	CustomEditor "Toybox.StandardHDRPGUI"

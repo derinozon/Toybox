@@ -7,10 +7,12 @@ namespace Toybox {
 	public class StandardHDRPGUI : ShaderGUI {
 		Color color, outlineColor;
 		Texture albedoMap, normalMap, maskMap, emissionMap, heightMap, detailMap;
-		float emissionStr, outlineWidth;
+		float emissionStr, outlineWidth, occlusionStrenght;
 
 		float metallicStr = 0f;
 		float smoothnessStr = 0.5f;
+		float heightmapStr = 0.005f;
+
 		Vector2 tiling = Vector2.one;
 		Vector2 offset = Vector2.zero;
 
@@ -54,6 +56,10 @@ namespace Toybox {
 			emissionStr = targetMat.GetFloat("_EmissionStr");
 			emissionColor = targetMat.GetColor("_EmissionColor");
 			
+			heightmapStr = targetMat.GetFloat("_HeightPower");
+			// Dead variable
+			// occlusionStrenght = targetMat.GetFloat("_OcclusionStrenght");
+
 			smoothnessStr = targetMat.GetFloat("_Smoothness");
 			metallicStr = targetMat.GetFloat("_Metalness");
 
@@ -101,6 +107,9 @@ namespace Toybox {
 				metallicStr = EditorGUILayout.Slider("Metallic", metallicStr, 0, 1);
 				smoothnessStr = EditorGUILayout.Slider("Smoothness", smoothnessStr, 0, 1);
 			}
+			else {
+				occlusionStrenght = EditorGUILayout.Slider("AO Strenght", occlusionStrenght, 0, 1);
+			}
 
 			emissionColor = EditorGUILayout.ColorField(new GUIContent("Emission Color"), emissionColor, true, false, true);
 			if (emissionMap != null || emissionColor != Color.black) {
@@ -108,8 +117,12 @@ namespace Toybox {
 				giFlags = (MaterialGlobalIlluminationFlags) EditorGUILayout.EnumPopup("Emission GI", giFlags);
 			}
 			
-
-			
+			if (heightMap) {
+				heightmapStr = EditorGUILayout.Slider("Heightmap Strenght", heightmapStr, 0f, 0.1f);
+			}
+			else {
+				heightmapStr = 0;
+			}
 
 			if (renderType == RenderType.Opaque) {
 				showOutline = EditorGUILayout.Toggle("Display Outline", showOutline);
@@ -129,6 +142,10 @@ namespace Toybox {
 				targetMat.SetTexture("_Emission", emissionMap);
 				targetMat.SetTexture("_HeightMap", heightMap);
 
+				targetMat.SetFloat("_HeightPower", heightmapStr);
+
+				// Dead variable
+				// targetMat.SetFloat("_OcclusionStrenght", occlusionStrenght);
 				targetMat.SetFloat("_EmissionStr", emissionStr);
 				targetMat.SetColor("_EmissionColor", emissionColor);
 
@@ -172,9 +189,6 @@ namespace Toybox {
 					targetMat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
 					targetMat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
 					targetMat.SetInt("_ZWrite", 1);
-					//targetMat.DisableKeyword("TPP");
-					targetMat.renderQueue = 2000;
-
 
 					if (showOutline) {
 						targetMat.EnableKeyword("OUTLINE_ON");
@@ -186,7 +200,7 @@ namespace Toybox {
 					}
 					else {
 						targetMat.DisableKeyword("OUTLINE_ON");
-						targetMat.renderQueue = 2000;
+						targetMat.renderQueue = 2600;
 						targetMat.SetShaderPassEnabled("Always", false);
 					}
 				}

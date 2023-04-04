@@ -98,23 +98,22 @@ Shader "Toybox/StandardHDRP" {
 			#endif
             ENDCG
 		}
+
 		
 		////////////////////
 		// Object Drawing //
 		////////////////////
-
 		ZWrite [_ZWrite]
 		Blend [_SrcBlend] [_DstBlend]
 
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
+		// Tags { "RenderType" = "Opaque" }
+		// LOD 200
 		Cull Back
 
 		CGPROGRAM	
 		#pragma surface surf Standard fullforwardshadows keepalpha
 		#include "StandardHDRPMain.cginc"
 		ENDCG
-		
 
 		//////////////////
 		// Double Sided //
@@ -127,8 +126,6 @@ Shader "Toybox/StandardHDRP" {
 		Cull Front
 
 		CGPROGRAM
-		// #pragma multi_compile __ DOUBLE_SIDED
-		// #if DOUBLE_SIDED
 		#pragma surface surf Standard fullforwardshadows keepalpha
 		#pragma vertex vert
 		#include "StandardHDRPMain.cginc"
@@ -137,9 +134,28 @@ Shader "Toybox/StandardHDRP" {
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 			v.normal = -v.normal;
 		}
-		// #endif
 		ENDCG
     }
+	SubShader {
+		ZWrite [_ZWrite]
+		Blend [_SrcBlend] [_DstBlend]
+
+		Tags { "RenderType" = "Opaque" }
+		LOD 200
+		Cull Front
+
+		CGPROGRAM
+		#pragma surface surf Standard fullforwardshadows keepalpha
+		#pragma vertex vert
+		#include "StandardHDRPMain.cginc"
+
+		void vert(inout appdata_full v, out Input o) {
+			UNITY_INITIALIZE_OUTPUT(Input, o);
+			v.normal = -v.normal;
+		}
+		ENDCG
+	}
+
     FallBack "Diffuse"
 	CustomEditor "Toybox.StandardHDRPGUI"
 }

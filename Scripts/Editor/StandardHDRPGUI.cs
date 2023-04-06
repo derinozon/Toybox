@@ -16,12 +16,12 @@ namespace Toybox {
 		Vector2 tiling = Vector2.one;
 		Vector2 offset = Vector2.zero;
 
-		bool showEmission, showOutline;
+		bool showOutline, doubleSided;
 
 		enum RenderType {
 			Opaque, Transparent
 		};
-
+		
 		RenderType renderType;
 
 		[ColorUsage(false, true)]
@@ -43,7 +43,6 @@ namespace Toybox {
 			//base.OnGUI(materialEditor, properties);
 			Material targetMat = materialEditor.target as Material;
 
-
 			// --- Get Material Properties --- //
 			color = targetMat.GetColor("_Color");
 
@@ -57,8 +56,6 @@ namespace Toybox {
 			emissionColor = targetMat.GetColor("_EmissionColor");
 			
 			heightmapStr = targetMat.GetFloat("_HeightPower");
-			// Dead variable
-			// occlusionStrenght = targetMat.GetFloat("_OcclusionStrenght");
 
 			smoothnessStr = targetMat.GetFloat("_Smoothness");
 			metallicStr = targetMat.GetFloat("_Metalness");
@@ -66,13 +63,14 @@ namespace Toybox {
 			tiling = targetMat.GetTextureScale("_MainTex");
 			offset = targetMat.GetTextureOffset("_MainTex");
 			
+			doubleSided = targetMat.GetInt("_Culling")==0;
+
 			showOutline = targetMat.IsKeywordEnabled("OUTLINE_ON");
 			outlineColor = targetMat.GetColor("_OutlineColor");
 			outlineWidth = targetMat.GetFloat("_OutlineWidth");
 
 			renderType = targetMat.renderQueue < 3000 ? RenderType.Opaque : RenderType.Transparent;
 			giFlags = targetMat.globalIlluminationFlags;
-			
 
 			// --- Render UI --- //
 			EditorGUI.BeginChangeCheck();
@@ -113,7 +111,6 @@ namespace Toybox {
 
 			emissionColor = EditorGUILayout.ColorField(new GUIContent("Emission Color"), emissionColor, true, false, true);
 			if (emissionMap != null || emissionColor != Color.black) {
-				//emissionStr = EditorGUILayout.Slider("Emission Strength", emissionStr, 0, 10);
 				giFlags = (MaterialGlobalIlluminationFlags) EditorGUILayout.EnumPopup("Emission GI", giFlags);
 			}
 			
@@ -131,6 +128,8 @@ namespace Toybox {
 					outlineWidth = EditorGUILayout.Slider("Outline Width", outlineWidth, 1, 1.1f);
 				}
 			}
+
+			doubleSided = EditorGUILayout.Toggle("Double Sided", doubleSided);
 			
 			// --- Set Values If Changed --- //
 			if (EditorGUI.EndChangeCheck()) {
@@ -144,8 +143,6 @@ namespace Toybox {
 
 				targetMat.SetFloat("_HeightPower", heightmapStr);
 
-				// Dead variable
-				// targetMat.SetFloat("_OcclusionStrenght", occlusionStrenght);
 				targetMat.SetFloat("_EmissionStr", emissionStr);
 				targetMat.SetColor("_EmissionColor", emissionColor);
 
@@ -174,14 +171,18 @@ namespace Toybox {
 					targetMat.EnableKeyword("MASK_ON");
 				}
 
-				
+				if (doubleSided) {
+					targetMat.SetInt("_Culling", (int)UnityEngine.Rendering.CullMode.Off);
+				}
+				else {
+					targetMat.SetInt("_Culling", (int)UnityEngine.Rendering.CullMode.Back);
+				}
 
 				if (renderType == RenderType.Transparent) {
 					targetMat.SetOverrideTag("RenderType", "Transparent");
 					targetMat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
 					targetMat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
 					targetMat.SetInt("_ZWrite", 0);
-					// targetMat.EnableKeyword("TPP");
 					targetMat.renderQueue = 3000;
 				}
 				else {
@@ -204,8 +205,6 @@ namespace Toybox {
 						targetMat.SetShaderPassEnabled("Always", false);
 					}
 				}
-
-				
 			}
 		}
 	}

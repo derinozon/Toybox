@@ -28,6 +28,7 @@ Shader "Toybox/StandardHDRP" {
 		[Toggle] _ZWrite ("ZWrite", Float) = 1
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("SrcBlend", Float) = 1
         [Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("DstBlend", Float) = 0
+		[Enum(UnityEngine.Rendering.CullMode)] _Culling ("Culling", Int) = 0
     }
 	
     SubShader {
@@ -40,18 +41,16 @@ Shader "Toybox/StandardHDRP" {
 		//////////////////
 		// Outline Pass //
 		//////////////////
-
 		Pass {
 			// Unity does not allow SetShaderPassEnabled with Name tag. //
 
 			Name "OutlinePass"
 			Tags { "LightMode" = "Always" } 
-			//Tags { "LightMode" = "OutlinePass" }
 			Zwrite Off
 
     		CGPROGRAM
+			#pragma target 3.0
 			#pragma multi_compile __ OUTLINE_ON
-			//#pragma shader_feature OUTLINE_ON
 
     		#pragma vertex vert
     		#pragma fragment frag
@@ -99,62 +98,41 @@ Shader "Toybox/StandardHDRP" {
             ENDCG
 		}
 
-		
 		////////////////////
 		// Object Drawing //
 		////////////////////
 		ZWrite [_ZWrite]
 		Blend [_SrcBlend] [_DstBlend]
+		Cull [_Culling]
 
-		// Tags { "RenderType" = "Opaque" }
-		// LOD 200
-		Cull Back
-
-		CGPROGRAM	
+		CGPROGRAM
+		#pragma target 3.0
 		#pragma surface surf Standard fullforwardshadows keepalpha
 		#include "StandardHDRPMain.cginc"
 		ENDCG
 
+		// Legacy double sided pass //
 		//////////////////
 		// Double Sided //
 		//////////////////
-		ZWrite [_ZWrite]
-		Blend [_SrcBlend] [_DstBlend]
+		// ZWrite [_ZWrite]
+		// Blend [_SrcBlend] [_DstBlend]
 
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
-		Cull Front
+		// Tags { "RenderType" = "Opaque" }
+		// LOD 200
+		// Cull Front
 
-		CGPROGRAM
-		#pragma surface surf Standard fullforwardshadows keepalpha
-		#pragma vertex vert
-		#include "StandardHDRPMain.cginc"
+		// CGPROGRAM
+		// #pragma surface surf Standard fullforwardshadows keepalpha
+		// #pragma vertex vert
+		// #include "StandardHDRPMain.cginc"
 
-		void vert(inout appdata_full v, out Input o) {
-			UNITY_INITIALIZE_OUTPUT(Input, o);
-			v.normal = -v.normal;
-		}
-		ENDCG
+		// void vert(inout appdata_full v, out Input o) {
+		// 	UNITY_INITIALIZE_OUTPUT(Input, o);
+		// 	v.normal = -v.normal;
+		// }
+		// ENDCG
     }
-	SubShader {
-		ZWrite [_ZWrite]
-		Blend [_SrcBlend] [_DstBlend]
-
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
-		Cull Front
-
-		CGPROGRAM
-		#pragma surface surf Standard fullforwardshadows keepalpha
-		#pragma vertex vert
-		#include "StandardHDRPMain.cginc"
-
-		void vert(inout appdata_full v, out Input o) {
-			UNITY_INITIALIZE_OUTPUT(Input, o);
-			v.normal = -v.normal;
-		}
-		ENDCG
-	}
 
     FallBack "Diffuse"
 	CustomEditor "Toybox.StandardHDRPGUI"

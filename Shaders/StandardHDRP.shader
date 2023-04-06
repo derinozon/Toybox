@@ -28,7 +28,7 @@ Shader "Toybox/StandardHDRP" {
 		[Toggle] _ZWrite ("ZWrite", Float) = 1
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("SrcBlend", Float) = 1
         [Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("DstBlend", Float) = 0
-		[Enum(UnityEngine.Rendering.CullMode)] _Culling ("Culling", Int) = 0
+		[Enum(UnityEngine.Rendering.CullMode)] _Culling ("Culling", Int) = 2
     }
 	
     SubShader {

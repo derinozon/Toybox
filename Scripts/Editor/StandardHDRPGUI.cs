@@ -16,7 +16,8 @@ namespace Toybox {
 		Vector2 tiling = Vector2.one;
 		Vector2 offset = Vector2.zero;
 
-		bool showOutline, doubleSided;
+		bool showOutline;
+		bool doubleSided = true;
 
 		enum RenderType {
 			Opaque, Transparent
@@ -121,6 +122,8 @@ namespace Toybox {
 				heightmapStr = 0;
 			}
 
+			doubleSided = EditorGUILayout.Toggle("Double Sided", doubleSided);
+
 			if (renderType == RenderType.Opaque) {
 				showOutline = EditorGUILayout.Toggle("Display Outline", showOutline);
 				if (showOutline) {
@@ -129,8 +132,6 @@ namespace Toybox {
 				}
 			}
 
-			doubleSided = EditorGUILayout.Toggle("Double Sided", doubleSided);
-			
 			// --- Set Values If Changed --- //
 			if (EditorGUI.EndChangeCheck()) {
 				targetMat.SetColor("_Color", color);

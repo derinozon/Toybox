@@ -1,6 +1,7 @@
 using UnityEngine;
 
 namespace Toybox {
+
 	[CreateAssetMenu(fileName = "DefaultPlayerSetting", menuName = "DK/PlayerSettings", order = 1)]
 	public class PlayerSettings : ScriptableObject {
 		[Header("Movement Settings")]
@@ -24,5 +25,13 @@ namespace Toybox {
 
 		[Header("Advanced Settings")]
 		public float raycastError = 0.02f;
+
+		[Header("Default Input Strings")]
+		public string moveX = "Horizontal";
+		public string moveY = "Vertical";
+		public string lookX ="Mouse X";
+		public string lookY = "Mouse Y";
+		public string sprint = "Fire3";
 	}
+
 }

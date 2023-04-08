@@ -7,6 +7,20 @@ namespace Toybox {
 		public UnityEvent OnWalk;
 		public UnityEvent OnJump;
 	}
+
+	[System.Serializable]
+	public struct InputData {
+		public float moveX, moveY, lookX, lookY;
+		public bool sprint;
+
+		public InputData (float moveX, float moveY, float lookX, float lookY, bool sprint) {
+			this.moveX = moveX;
+			this.moveY = moveY;
+			this.lookX = lookX;
+			this.lookY = lookY;
+			this.sprint = sprint;
+		}
+	}
 	
 	public class PlayerControllerCore : MonoBehaviour {
 		
@@ -17,9 +31,11 @@ namespace Toybox {
 		public bool lockRotation = false;
 		public bool headbobbing = true;
 		public bool enableFootstep = true;
+		public bool manualInput = false;
 
 		public PlayerEvents events;
 		
+		InputData input;
 		bool isFlying;
 		float vRot;
 		bool sprinting;
@@ -41,33 +57,38 @@ namespace Toybox {
 		}
 		
 		virtual protected void Update () {
+			if (!manualInput) {
+				input = new InputData(
+					Input.GetAxisRaw(settings.moveX),
+					Input.GetAxisRaw(settings.moveY),
+					Input.GetAxis(settings.lookX),
+					Input.GetAxis(settings.lookY),
+					Input.GetButton(settings.sprint)
+				);
+			}
 
-			if (!enableMovement) {
-				movementDir = Vector3.zero;
-			}
-			else {
-				sprinting = Input.GetButton("Fire3");
-				float percievedMaxVel = sprinting ? settings.maxVelocity*settings.sprintMultiplier : settings.maxVelocity; 
-				MovePlayer();
-			}
+			movementDir = enableMovement ? CalculateMovement() : Vector3.zero;
 
 			if (!lockRotation)
 				RotateCam();
 
-			if (headbobbing && !isFlying)
-				BobHead();
+			if (!isFlying) {
+				if (headbobbing)
+					BobHead();
 
-			if (enableFootstep && !isFlying)
-				Footstep();
+				if (enableFootstep)
+					Footstep();
+			}
 		}
 
-		void MovePlayer () {
+		public void PollInput (InputData input) {
+			this.input = input;
+		}
+
+		Vector3 CalculateMovement () {
 			float movSpeed = sprinting ? settings.movementSpeed * settings.sprintMultiplier : settings.movementSpeed;
-			float h = Input.GetAxisRaw("Horizontal");
-			float v = Input.GetAxisRaw("Vertical");
-			
-			movementDir = new Vector3(h, 0, v).normalized * movSpeed;
-			movementDir = transform.TransformDirection(movementDir);
+			Vector3 movDir = new Vector3(input.moveX, 0, input.moveY).normalized * movSpeed;
+			return transform.TransformDirection(movDir);
 		}
 
 		void Footstep () {
@@ -102,13 +123,11 @@ namespace Toybox {
 		}
 
 		void RotateCam () {
-			float mY = Input.GetAxis("Mouse Y");
-			float mX = Input.GetAxis("Mouse X");
 
-			vRot += mY * settings.sensivity;
+			vRot += input.lookY * settings.sensivity;
 			vRot = Mathf.Clamp(vRot, -60, 60);
 
-			transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * settings.sensivity);
+			transform.Rotate(Vector3.up * input.lookX * settings.sensivity);
 			camT.localEulerAngles = Vector3.left * vRot;
 
 			if (transform.eulerAngles.x != 0) {

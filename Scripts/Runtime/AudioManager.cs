@@ -1,14 +1,28 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Toybox {
 	public class AudioManager : MonoBehaviour {
 		public static AudioManager instance;
 
 		public AudioSource musicSource, sfxSource;
-		[Range(0,1)]
+		[Range(0f, 1f)]
 		public float musicVolume = 0.5f, sfxVolume = 0.5f;
+		public bool playMusicOnAwake;
 
-		void Awake() {
+		protected List<AudioSource> registeredSources;
+
+		[System.Serializable]
+		public class SoundBank {
+			public string name = "";
+			public AudioClip clip;
+			[Range(0f, 1f)]
+			public float volume = 1f;
+		};
+		
+		public SoundBank[] soundBank;
+
+		protected virtual void Awake() {
 			if (AudioManager.instance) {
 				Destroy(gameObject);
 			}
@@ -19,8 +33,8 @@ namespace Toybox {
 
 			if (!musicSource) {
 				musicSource = gameObject.AddComponent<AudioSource>();
-				musicSource.playOnAwake = false;
 			}
+			musicSource.playOnAwake = playMusicOnAwake;
 
 			if (!sfxSource) {
 				sfxSource = gameObject.AddComponent<AudioSource>();
@@ -31,18 +45,24 @@ namespace Toybox {
 		void Update () {
 			musicSource.volume = musicVolume;
 			sfxSource.volume = sfxVolume;
+
+			foreach (var source in registeredSources) {
+				source.volume = sfxVolume;
+			}
 		}
 
-		public void PlayMusic(AudioClip clip) {
+		// Method to introduce an Audio Source to the global volume control
+		public void RegisterSource (AudioSource source) => registeredSources.Add(source);
+
+		public virtual void PlayMusic(AudioClip clip) {
 			musicSource.clip = clip;
 			musicSource.Play();
 		}
 
-		public void PlaySFX (AudioClip clip) {
-			sfxSource.PlayOneShot(clip);
-		}
+		// Plays an audio clip once
+		public virtual void PlaySFX (AudioClip clip, float volume = 1f) => sfxSource.PlayOneShot(clip, volume);
 
-		public void StopMusic() {
+		public virtual void StopMusic() {
 			musicSource.Stop();
 		}
 	}

@@ -14,7 +14,9 @@ namespace Toybox {
 
 		override protected void Update () {
 			base.Update();
-			controller.SimpleMove(movementDir);
+			if (enableMovement) {
+				controller.SimpleMove(movementDir);
+			}
 		}
 	}
 		

@@ -10,19 +10,20 @@ namespace Toybox {
 		public float musicVolume = 0.5f, sfxVolume = 0.5f;
 		public bool playMusicOnAwake;
 
-		protected List<AudioSource> registeredSources;
+		protected List<AudioSource> registeredSources = new List<AudioSource>();
 
 		[System.Serializable]
 		public class SoundBank {
-			public string name = "";
+			string name = "";
 			public AudioClip clip;
 			[Range(0f, 1f)]
 			public float volume = 1f;
 		};
 		
+		[HideInInspector]
 		public SoundBank[] soundBank;
 
-		protected virtual void Awake() {
+		void Awake() {
 			if (AudioManager.instance) {
 				Destroy(gameObject);
 			}
@@ -51,9 +52,18 @@ namespace Toybox {
 			}
 		}
 
+		SoundBank GetSoundFromBank (string name) {
+			foreach (var item in soundBank) {
+				if (item.clip.name == name)
+					return item;
+			}
+			return null;
+		}
+
 		// Method to introduce an Audio Source to the global volume control
 		public void RegisterSource (AudioSource source) => registeredSources.Add(source);
 
+		// Plays the music
 		public virtual void PlayMusic(AudioClip clip) {
 			musicSource.clip = clip;
 			musicSource.Play();
@@ -62,9 +72,17 @@ namespace Toybox {
 		// Plays an audio clip once
 		public virtual void PlaySFX (AudioClip clip, float volume = 1f) => sfxSource.PlayOneShot(clip, volume);
 
-		public virtual void StopMusic() {
-			musicSource.Stop();
+		public virtual void PlaySFX (string name) {
+			SoundBank sound = GetSoundFromBank(name);
+			if (sound != null) {
+				sfxSource.PlayOneShot(sound.clip, sfxVolume * sound.volume);
+			}
+			else {
+				Debug.LogWarning("No such Audio Clip as " + name + " in Sound Bank");
+			}
 		}
+		// Stops the music
+		public virtual void StopMusic() => musicSource.Stop();
 	}
 }
 	

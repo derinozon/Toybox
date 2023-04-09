@@ -38,7 +38,8 @@ namespace Toybox {
 
 		void CreateTemp () {
 			var tempobj = new GameObject("TEMP");
-			tempobj.hideFlags = HideFlags.HideInHierarchy;
+			tempobj.transform.parent = root.transform;
+			// tempobj.hideFlags = HideFlags.HideInHierarchy;
 			temp = tempobj.AddComponent<AudioSource>();
 		}
 

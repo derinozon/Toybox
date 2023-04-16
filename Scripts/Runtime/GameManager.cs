@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Toybox {
-    public class GameManager : MonoBehaviour {
+    public class GameManager : Singleton<GameManager> {
 		public delegate void BoolEvent(bool value);
 		public delegate void IntEvent(int value);
 
@@ -24,14 +24,8 @@ namespace Toybox {
 		[HideInInspector]
 		public PCInfo sysInfo;
 
-		void Awake () {
-			if (GameManager.instance) {
-				Destroy(gameObject);
-			}
-			else {
-				GameManager.instance = this;
-				DontDestroyOnLoad(gameObject);
-			}
+		protected override void Awake () {
+			base.Awake();
 
 			OnPause += (a) => {};
 			OnLevelLoaded += (a) => {};

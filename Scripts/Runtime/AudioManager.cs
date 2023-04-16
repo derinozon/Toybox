@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Toybox {
-	public class AudioManager : MonoBehaviour {
+	public class AudioManager : Singleton<AudioManager> {
 		public static AudioManager instance;
 
 		public AudioSource musicSource, sfxSource;
@@ -14,7 +14,6 @@ namespace Toybox {
 
 		[System.Serializable]
 		public class SoundBank {
-			string name = "";
 			public AudioClip clip;
 			[Range(0f, 1f)]
 			public float volume = 1f;
@@ -23,14 +22,8 @@ namespace Toybox {
 		[HideInInspector]
 		public SoundBank[] soundBank;
 
-		void Awake() {
-			if (AudioManager.instance) {
-				Destroy(gameObject);
-			}
-			else {
-				AudioManager.instance = this;
-				DontDestroyOnLoad(gameObject);
-			}
+		protected override void Awake() {
+			base.Awake();
 
 			if (!musicSource) {
 				musicSource = gameObject.AddComponent<AudioSource>();

@@ -37,8 +37,8 @@ namespace Toybox {
 		
 		InputData input;
 		bool isFlying;
-		float vRot;
 		bool sprinting;
+		float vRot;
 		float footstepTimer;
 		float bobTimer = Mathf.PI / 2;
 		Vector3 headRestPosition;

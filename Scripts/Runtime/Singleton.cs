@@ -7,7 +7,6 @@ namespace Toybox {
 		public static T Instance {
 			get {
 				if (instance == null) {
-					// instance = FindObjectOfType<T>();
 					Debug.LogWarning("Singleton is null!");
 				}
 				return instance;

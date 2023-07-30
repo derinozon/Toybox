@@ -8,8 +8,6 @@ namespace Toybox {
 		public delegate void BoolEvent(bool value);
 		public delegate void IntEvent(int value);
 
-		public static GameManager instance;
-
 		// public PostProcessProfile playerProfile;
 
 		public Cursor cursorClick;

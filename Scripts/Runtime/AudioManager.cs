@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 namespace Toybox {
 	public class AudioManager : Singleton<AudioManager> {
-		public static AudioManager instance;
-
+		
 		public AudioSource musicSource, sfxSource;
 		[Range(0f, 1f)]
 		public float musicVolume = 0.5f, sfxVolume = 0.5f;

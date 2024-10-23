@@ -13,10 +13,19 @@ MonoBehaviour:
   m_Name: DefaultPlayerSetting
   m_EditorClassIdentifier: 
   sprintMultiplier: 2
-  movementSpeed: 3
+  movementSpeed: 1
   jumpForce: 3
-  maxVelocity: 5
+  maxVelocity: 3
   freeFallLimit: -50
+  footstepFrequency: 0.4
   sensivity: 3
+  headRestTransitionSpeed: 20
+  bobSpeed: 5
+  bobAmount: 0.05
   gravityScale: 1
   raycastError: 0.02
+  moveX: Horizontal
+  moveY: Vertical
+  lookX: Mouse X
+  lookY: Mouse Y
+  sprint: Fire3

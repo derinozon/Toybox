@@ -184,7 +184,7 @@ namespace Toybox {
 			return Physics.SphereCast(ray, col.radius, settings.raycastError*2);
 		}
 		
-		void OnDrawGizmosSelected() {
+		void OnDrawGizmosSelected () {
 			col = GetComponent<CapsuleCollider>();
 			
 			if (col && settings) {

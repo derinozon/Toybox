@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Toybox {
 
-	[CreateAssetMenu(fileName = "DefaultPlayerSetting", menuName = "DK/PlayerSettings", order = 1)]
+	[CreateAssetMenu(fileName = "DefaultPlayerSetting", menuName = "Toybox/PlayerSettings", order = 1)]
 	public class PlayerSettings : ScriptableObject {
 		[Header("Movement Settings")]
 		public float sprintMultiplier = 2;

@@ -73,15 +73,15 @@ namespace Toybox {
 				Footstep();
 
 			// Speed Limiting
-			if (rb.velocity.magnitude > percievedMaxVel) {
-				Vector3 newVelocity = rb.velocity.normalized;
+			if (rb.linearVelocity.magnitude > percievedMaxVel) {
+				Vector3 newVelocity = rb.linearVelocity.normalized;
 				newVelocity *= percievedMaxVel;
-				rb.velocity = new Vector3(newVelocity.x, rb.velocity.y, newVelocity.z);
+				rb.linearVelocity = new Vector3(newVelocity.x, rb.linearVelocity.y, newVelocity.z);
 			}
 			
 			// Limit free fall speed
-			if (rb.velocity.y < settings.freeFallLimit) {
-				rb.velocity = new Vector3(rb.velocity.x, settings.freeFallLimit, rb.velocity.z);
+			if (rb.linearVelocity.y < settings.freeFallLimit) {
+				rb.linearVelocity = new Vector3(rb.linearVelocity.x, settings.freeFallLimit, rb.linearVelocity.z);
 			}
 		}
 
@@ -94,7 +94,7 @@ namespace Toybox {
 
 			// De-accelerate
 			if (movementDir == Vector3.zero && !isFlying) {
-				rb.velocity = new Vector3(rb.velocity.x*0.9f, rb.velocity.y, rb.velocity.z*0.9f);
+				rb.linearVelocity = new Vector3(rb.linearVelocity.x*0.9f, rb.linearVelocity.y, rb.linearVelocity.z*0.9f);
 			}
 
 			// Gravity
@@ -104,7 +104,7 @@ namespace Toybox {
 		void Jump () {
 			if (GroundCheck()) {
 				if (Input.GetKey(KeyCode.Space)) {
-					rb.velocity = new Vector3(rb.velocity.x, settings.jumpForce, rb.velocity.z);
+					rb.linearVelocity = new Vector3(rb.linearVelocity.x, settings.jumpForce, rb.linearVelocity.z);
 					if (!isFlying) {
 						events.OnJump.Invoke();
 					}
